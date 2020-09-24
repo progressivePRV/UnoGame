@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="signup">Sign Up</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="firstname">First Name</string>
+    <string name="lastname">Last Name</string>
+    <string name="choose_password">Password</string>
+    <string name="repeat">Confirm Password</string>
+    <string name="AutoFillHint" />
+    <string name="cancel">Cancel</string>
+    <string name="gender">Gender</string>
+    <string name="city">City</string>
+    <string name="logout">Logout</string>
+    <string name="forgotPassword">Forgot  Password</string>
+    <string name="defaultImageTag">Defualt Image</string>
+    <string name="newImageTag">New Image</string>
+    <string name="menu_chatrooms">Chatrooms</string>
+    <string name="menu_users">Users</string>
+    <string name="menu_logout">Logout</string>
+    <string name="menu_myprofile">My Profile</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="chatroomname">Enter Chat Room Name</string>
+
+    <string name="createButton">Create</string>
+    <string name="ViewUsers">View Users</string>
+    <string name="EnterMessage">Enter Message</string>
+    <string name="sendMessage">Send</string>
+    <string name="firstNameLabel">First Name:</string>
+    <string name="lastNameLabel">Last Name:</string>
+    <string name="genderLabel">"Gender: "</string>
+    <string name="emailLabel">Email:</string>
+    <string name="cityLabel">City:</string>
+    <string name="editProfileLabel">Edit Profile</string>
+    <string name="edit">Edit</string>
+    <string name="chatRoomNewButton">Create New Chat Room</string>
+    <string name="name">Name</string>
+    <string name="request_ride">Request Ride</string>
+    <string name="name_tag">Name :</string>
+    <string name="to_tag">To </string>
+    <string name="cannot_be_empty">Cannot Be Empty</string>
+    <string name="Location">Location</string>
+    <string name="from_tag">From</string>
+    <string name="send_ride_request">Send Ride Request</string>
+
+    <string name="api_key">AIzaSyAkeRuiAd1IOFXF9rr4IA_RNXgYZMTSqs4</string>
+    <string name="title_activity_driver_maps">Map</string>
+    <string name="Riders_Name">Riders Name</string>
+    <string name="confirmRideNo">No</string>
+    <string name="confirmRideYes">Yes</string>
+    <string name="fromLabel">"From: "</string>
+    <string name="tolabel">To:</string>
+    <string name="title_activity_on_ride">Map</string>
+    <string name="title_activity_rider_on_ride">Map</string>
+    <string name="cancelRide">Cancel Ride</string>
+    <string name="menu_priviousRide">Previous Rides</string>
+    <string name="date_text">"Date: "</string>
+    <string name="riderRequest">Ride Request</string>
+    <string name="requestARide">Request a Ride</string>
+    <string name="ride">Ride</string>
+</resources>

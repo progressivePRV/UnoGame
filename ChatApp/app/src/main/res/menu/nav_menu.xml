@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_chatrooms"
+            android:title="@string/menu_chatrooms" />
+        <!--  android:icon="@android:drawable/ic_menu_mapmode" -->
+        <item
+            android:id="@+id/nav_users"
+          android:title="@string/menu_users" />
+
+      <item
+          android:id="@+id/nav_myprofile"
+          android:title="@string/menu_myprofile" />
+
+        <item
+            android:id="@+id/nav_previous_ride"
+            android:title="@string/menu_priviousRide" />
+
+      <item
+          android:id="@+id/nav_logout"
+          android:title="@string/menu_logout" />
+  </group>
+</menu>
