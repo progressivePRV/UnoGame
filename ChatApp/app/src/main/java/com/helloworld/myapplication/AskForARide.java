@@ -234,6 +234,7 @@ public class AskForARide extends AppCompatActivity {
         super.onPostResume();
         //cnt=0;
         //setting snapshot listener to the drivers accepted list and adding it in a list to display it in the alert box
+
         DocumentReference docRef = db.collection("ChatRoomList")
                 .document(chatRoomName)
                 .collection("Requested Rides")
@@ -255,7 +256,7 @@ public class AskForARide extends AppCompatActivity {
                         Intent intent = new Intent(AskForARide.this,RiderOnRideActivity.class);
                         intent.putExtra("chatRoomName",chatRoomName);
                         intent.putExtra("requestedRide",updateRideDetails);
-                        progressDialog.hide();
+                        //progressDialog.hide();
                         startActivity(intent);
                         finish();
                     }
