@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id = "@+id/button_game"
+        android:icon="@drawable/ic_baseline_gamepad_24"
+        android:title="@string/request_game"
+        app:showAsAction="always"/>
+
+    <item
         android:id = "@+id/request_ride"
         android:icon="@drawable/car"
         android:title="@string/request_ride"

@@ -93,6 +93,7 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatMessageAd
         Log.d(TAG, "onResume: in chatroomActivity");
         super.onResume();
         addingListenerRequestedRide();
+        addingListenerUnoGame();
     }
 
     @Override
@@ -339,6 +340,46 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatMessageAd
                 });
     }
 
+    public void addingListenerUnoGame(){
+
+        //Adding snapshot to the requested rides in the chatroom
+        db.collection("ChatRoomList")
+                .document(chatRoomName)
+                .collection("UnoGame")
+                .addSnapshotListener(ChatRoomActivity.this, new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            Log.w("TAG", "listen:error", e);
+                            return;
+                        }
+
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    //Toast.makeText(ChatRoomActivity.this, "It comes to addded", Toast.LENGTH_SHORT).show();
+                                    GameDetailsClass added = dc.getDocument().toObject(GameDetailsClass.class);
+                                    mAuth = FirebaseAuth.getInstance();
+                                    if(added.gameState.equals("REQUESTED") && (added.rejectedPlayers!=null && !added.rejectedPlayers.contains(mAuth.getCurrentUser().getUid()))){
+                                        Intent intent = new Intent(ChatRoomActivity.this, GameRequestScreenActivity.class);
+                                        intent.putExtra("chatRoomName",chatRoomName);
+                                        intent.putExtra("GameDetailsClass", added);
+                                        intent.putExtra("userProfile",user);
+                                        startActivity(intent);
+                                    }
+                                    break;
+                                case MODIFIED:
+                                    //Toast.makeText(ChatRoomActivity.this, "It comes to modified", Toast.LENGTH_SHORT).show();
+                                    break;
+                                case REMOVED:
+                                    //Toast.makeText(ChatRoomActivity.this, "It comes to deleted", Toast.LENGTH_SHORT).show();
+                                    break;
+                            }
+                        }
+                    }
+                });
+    }
 
     //For checking the empty strings
     public boolean checkValidations(EditText editText){
@@ -439,6 +480,17 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatMessageAd
                 i.putExtra("chatRoomName",chatRoomName);
                 i.putExtra("user",user);
                 startActivity(i);
+
+            case R.id.button_game:
+                showProgressBarDialog();
+                //Here the request will be added to the firebase so the other users will be listening
+                GameDetailsClass gameDetails = new GameDetailsClass();
+                gameDetails.player1Id = user.uid;
+                gameDetails.gameState = "REQUESTED";
+                Intent intent = new Intent(ChatRoomActivity.this, LoadGameActivity.class);
+                intent.putExtra("chatRoomName",chatRoomName);
+                intent.putExtra("gameDetails",gameDetails);
+                startActivity(intent);
 
             default:
                 Log.d(TAG, "onOptionsItemSelected: default case called in chatroom activity");

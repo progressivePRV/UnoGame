@@ -60,4 +60,12 @@
     <string name="riderRequest">Ride Request</string>
     <string name="requestARide">Request a Ride</string>
     <string name="ride">Ride</string>
+    <string name="request_game">request game button</string>
+    <string name="game_start">Start Game</string>
+    <string name="welcome_game_message">Welcome to UNO game</string>
+    <string name="confirmedGameYes">Yes</string>
+    <string name="confirmedGameNo">No</string>
+    <string name="RequestedPlayerName">Player Name</string>
+    <string name="requestGameMessage">UNO Game Request</string>
+    <string name="verus">vs</string>
 </resources>
