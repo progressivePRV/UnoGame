@@ -22,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class LoadGameActivity extends AppCompatActivity {
 
@@ -149,6 +150,7 @@ public class LoadGameActivity extends AppCompatActivity {
             unoCardClassArrayList.add(unoCardClass);
         }
 
+        Collections.shuffle(unoCardClassArrayList);
         gameDetailsClass.deckCards = unoCardClassArrayList;
 
         db.collection("ChatRoomList")
