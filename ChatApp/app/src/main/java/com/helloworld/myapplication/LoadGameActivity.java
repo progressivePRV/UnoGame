@@ -151,6 +151,13 @@ public class LoadGameActivity extends AppCompatActivity {
         }
 
         Collections.shuffle(unoCardClassArrayList);
+        for(int i=0; i<7; i++){
+            gameDetailsClass.player1Cards.add(gameDetailsClass.deckCards.get(0));
+            gameDetailsClass.player2Cards.add(gameDetailsClass.deckCards.get(1));
+            gameDetailsClass.deckCards.remove(0);
+            gameDetailsClass.deckCards.remove(1);
+        }
+
         gameDetailsClass.deckCards = unoCardClassArrayList;
 
         db.collection("ChatRoomList")
@@ -163,9 +170,9 @@ public class LoadGameActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
                             hideProgressBarDialog();
-
                             //here the deck is ready. So both the palyers have to go to the gameScreenactivtiy
                             Intent intent = new Intent(LoadGameActivity.this, GameScreenActivity.class);
+                            intent.putExtra("chatRoomName",chatRoomName);
                             intent.putExtra("gameDetails",gameDetailsClass);
                             startActivity(intent);
                         }
