@@ -44,6 +44,8 @@ public class GameRequestScreenActivity extends AppCompatActivity {
         gameDetailsClass = (GameDetailsClass) getIntent().getExtras().getSerializable("GameDetailsClass");
         user = (UserProfile) getIntent().getExtras().getSerializable("userProfile");
 
+        attachListenerToGame();
+
         //if the player selected no then he is added to the game rejected player list
         findViewById(R.id.buttonPlayNo).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,8 +72,7 @@ public class GameRequestScreenActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-
-                                    attachListenerToGame();
+                                    hideProgressBarDialog();
                                 } else {
                                     hideProgressBarDialog();
                                     Toast.makeText(GameRequestScreenActivity.this, "Some issue occured in game", Toast.LENGTH_SHORT).show();
@@ -122,15 +123,22 @@ public class GameRequestScreenActivity extends AppCompatActivity {
                     if (snapshot != null && snapshot.exists()) {
                         //this is to check if someone has accepted the request for the game
                         gameDetailsClass = snapshot.toObject(GameDetailsClass.class);
-                        if(gameDetailsClass.gameState.equals("IN_PROGRESS") && gameDetailsClass.player2Id.equals(user.uid) && gameDetailsClass.deckCards.size() > 0){
-                            hideProgressBarDialog();
-                            Toast.makeText(GameRequestScreenActivity.this, "Game will be started soon.. Preparing the game", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(GameRequestScreenActivity.this, GameScreenActivity.class);
-                            intent.putExtra("gameDetails",gameDetailsClass);
-                            startActivity(intent);
+                        if(gameDetailsClass.gameState.equals("IN_PROGRESS")){
+                            if(gameDetailsClass.player2Id.equals(user.uid)){
+                                if(gameDetailsClass.deckCards.size() > 0){
+                                    hideProgressBarDialog();
+                                    Toast.makeText(GameRequestScreenActivity.this, "Game will be started soon.. Preparing the game", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(GameRequestScreenActivity.this, Player1GameScreenActivity.class);
+                                    intent.putExtra("chatRoomName",chatRoomName);
+                                    intent.putExtra("gameDetails",gameDetailsClass);
+                                    startActivity(intent);
+                                }
+                            }else{
+                                Toast.makeText(GameRequestScreenActivity.this, "This game is not available anymore", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
                         }
                     } else {
-                        hideProgressBarDialog();
                         System.out.print("Current data: null");
                     }
                 }

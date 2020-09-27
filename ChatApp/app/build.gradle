@@ -52,7 +52,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-simple:1.7.25'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.libraries.places:places:2.4.0'
-    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
+//    implementation 'com.squareup.okhttp3:okhttp:4.7.2'
 
     // Google Maps Services (needed for directions)
 

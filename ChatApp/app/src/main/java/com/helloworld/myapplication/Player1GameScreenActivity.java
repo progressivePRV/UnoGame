@@ -7,19 +7,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class GameScreenActivity extends AppCompatActivity {
+public class Player1GameScreenActivity extends AppCompatActivity {
 
     private RecyclerView mainRecyclerView;
     private RecyclerView.Adapter mainAdapter;
@@ -35,15 +32,15 @@ public class GameScreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game_screen);
+        setContentView(R.layout.activity_player1_game_screen);
 
         //Adding listener to the document for playing
         usersRecyclerView = (RecyclerView) findViewById(R.id.playerCardRecyclerView);
-        usersLayoutManager = new LinearLayoutManager(GameScreenActivity.this,
+        usersLayoutManager = new LinearLayoutManager(Player1GameScreenActivity.this,
                 LinearLayoutManager.HORIZONTAL, false);
         usersRecyclerView.setLayoutManager(usersLayoutManager);
 
-        usersAdapter = new PlayerCardListAdapter(unoCardClassArrayList, GameScreenActivity.this);
+        usersAdapter = new PlayerCardListAdapter(unoCardClassArrayList, Player1GameScreenActivity.this);
         usersRecyclerView.setAdapter(usersAdapter);
 
         db = FirebaseFirestore.getInstance();
@@ -58,7 +55,7 @@ public class GameScreenActivity extends AppCompatActivity {
                 .collection("UnoGame")
                 .document(documentId);
 
-        docRef.addSnapshotListener(GameScreenActivity.this, new EventListener<DocumentSnapshot>() {
+        docRef.addSnapshotListener(Player1GameScreenActivity.this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
@@ -70,13 +67,8 @@ public class GameScreenActivity extends AppCompatActivity {
                     //this is to check if someone has accepted the request for the game
                     gameDetailsClass = snapshot.toObject(GameDetailsClass.class);
                     unoCardClassArrayList = new ArrayList<>();
-                    if(documentId.equals(gameDetailsClass.player1Id)){
-                        //It means that player1 is using this screen
-                        unoCardClassArrayList = gameDetailsClass.player1Cards;
-                    }else{
-                        //It means that player2 is using this screen
-                        unoCardClassArrayList = gameDetailsClass.player2Cards;
-                    }
+                    unoCardClassArrayList = gameDetailsClass.player1Cards;
+
                     usersAdapter.notifyDataSetChanged();
                 } else {
                     System.out.print("Current data: null");
