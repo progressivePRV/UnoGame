@@ -482,7 +482,7 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatMessageAd
                 startActivity(i);
 
             case R.id.button_game:
-                showProgressBarDialog();
+                //showProgressBarDialog();
                 //Here the request will be added to the firebase so the other users will be listening
                 GameDetailsClass gameDetails = new GameDetailsClass();
                 gameDetails.player1Id = user.uid;

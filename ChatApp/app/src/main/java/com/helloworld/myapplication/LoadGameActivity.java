@@ -120,31 +120,42 @@ public class LoadGameActivity extends AppCompatActivity {
     public void startGame(){
         UnoCardClass unoCardClass;
         ArrayList<UnoCardClass> unoCardClassArrayList = new ArrayList<>();
+
+        //10 number is equal to skip of that no.
+
         //for red color
-        for(int i=1; i<=9; i++){
+        for(int i=1; i<=10; i++){
             unoCardClass = new UnoCardClass();
             unoCardClass.color = "red";
             unoCardClass.number = i;
             unoCardClassArrayList.add(unoCardClass);
         }
         //for yellow color
-        for(int i=1; i<=9; i++){
+        for(int i=1; i<=10; i++){
             unoCardClass = new UnoCardClass();
             unoCardClass.color = "yellow";
             unoCardClass.number = i;
             unoCardClassArrayList.add(unoCardClass);
         }
         //for green color
-        for(int i=1; i<=9; i++){
+        for(int i=1; i<=10; i++){
             unoCardClass = new UnoCardClass();
             unoCardClass.color = "green";
             unoCardClass.number = i;
             unoCardClassArrayList.add(unoCardClass);
         }
         //for blue color
-        for(int i=1; i<=9; i++){
+        for(int i=1; i<=10; i++){
             unoCardClass = new UnoCardClass();
             unoCardClass.color = "blue";
+            unoCardClass.number = i;
+            unoCardClassArrayList.add(unoCardClass);
+        }
+
+        //for 4 black draw 4 s
+        for(int i=1; i<=4; i++){
+            unoCardClass = new UnoCardClass();
+            unoCardClass.color = "black";
             unoCardClass.number = i;
             unoCardClassArrayList.add(unoCardClass);
         }
@@ -154,7 +165,7 @@ public class LoadGameActivity extends AppCompatActivity {
             gameDetailsClass.player1Cards.add(unoCardClassArrayList.get(0));
             gameDetailsClass.player2Cards.add(unoCardClassArrayList.get(1));
             unoCardClassArrayList.remove(0);
-            unoCardClassArrayList.remove(1);
+            unoCardClassArrayList.remove(0); // after removing zeroth item nnow 1st will be zeroth item
         }
 
         gameDetailsClass.deckCards = unoCardClassArrayList;

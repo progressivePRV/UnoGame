@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -16,15 +17,14 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
 
-public class Player2GameScreenActivity extends AppCompatActivity {
+public class Player2GameScreenActivity extends AppCompatActivity implements PlayerCardListAdapter.InteractWithPlayerCardList {
 
-    private RecyclerView mainRecyclerView;
-    private RecyclerView.Adapter mainAdapter;
-    private RecyclerView.LayoutManager mainLayoutManager;
+
+    private static final String TAG = "okay";
     private RecyclerView usersRecyclerView;
     private RecyclerView.Adapter usersAdapter;
     private RecyclerView.LayoutManager usersLayoutManager;
-    ArrayList<UnoCardClass> unoCardClassArrayList = new ArrayList<>();
+    ArrayList<UnoCardClass> thisPlayerCard = new ArrayList<>();
     private FirebaseFirestore db;
     private String chatRoomName;
     private GameDetailsClass gameDetailsClass;
@@ -40,7 +40,7 @@ public class Player2GameScreenActivity extends AppCompatActivity {
                 LinearLayoutManager.HORIZONTAL, false);
         usersRecyclerView.setLayoutManager(usersLayoutManager);
 
-        usersAdapter = new PlayerCardListAdapter(unoCardClassArrayList, Player2GameScreenActivity.this);
+        usersAdapter = new PlayerCardListAdapter(thisPlayerCard, Player2GameScreenActivity.this);
         usersRecyclerView.setAdapter(usersAdapter);
 
         db = FirebaseFirestore.getInstance();
@@ -66,14 +66,32 @@ public class Player2GameScreenActivity extends AppCompatActivity {
                 if (snapshot != null && snapshot.exists()) {
                     //this is to check if someone has accepted the request for the game
                     gameDetailsClass = snapshot.toObject(GameDetailsClass.class);
-                    unoCardClassArrayList = new ArrayList<>();
-                    unoCardClassArrayList = gameDetailsClass.player2Cards;
-
+                    thisPlayerCard.clear();
+                    thisPlayerCard.addAll(gameDetailsClass.player2Cards);
+                    Log.d(TAG, "onEvent: in Player2GameScreenActivity adater item count=>"+usersAdapter.getItemCount());
                     usersAdapter.notifyDataSetChanged();
                 } else {
                     System.out.print("Current data: null");
                 }
             }
         });
+
+
+    }
+
+    @Override
+    public void PlayCard(int postion) {
+
+        // what ever you want to do after user clicker on car
+
+        UnoCardClass card = thisPlayerCard.remove(postion);
+        Toast.makeText(this, "you played=>"+card, Toast.LENGTH_SHORT).show();
+        usersAdapter.notifyDataSetChanged();
+
+
+        //card is user played card
+
+        //you need to block recycler view once player played
+
     }
 }

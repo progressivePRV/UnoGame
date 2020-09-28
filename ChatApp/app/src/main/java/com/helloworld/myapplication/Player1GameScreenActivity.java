@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -16,15 +17,13 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
 
-public class Player1GameScreenActivity extends AppCompatActivity {
+public class Player1GameScreenActivity extends AppCompatActivity implements PlayerCardListAdapter.InteractWithPlayerCardList{
 
-    private RecyclerView mainRecyclerView;
-    private RecyclerView.Adapter mainAdapter;
-    private RecyclerView.LayoutManager mainLayoutManager;
+    private static final String TAG = "okay";
     private RecyclerView usersRecyclerView;
     private RecyclerView.Adapter usersAdapter;
     private RecyclerView.LayoutManager usersLayoutManager;
-    ArrayList<UnoCardClass> unoCardClassArrayList = new ArrayList<>();
+    ArrayList<UnoCardClass> thisPlayerCard = new ArrayList<>();
     private FirebaseFirestore db;
     private String chatRoomName;
     private GameDetailsClass gameDetailsClass;
@@ -33,6 +32,7 @@ public class Player1GameScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player1_game_screen);
+        Log.d(TAG, "onCreate: called in Player1GameScreenActivity");
 
         //Adding listener to the document for playing
         usersRecyclerView = (RecyclerView) findViewById(R.id.playerCardRecyclerView);
@@ -40,8 +40,9 @@ public class Player1GameScreenActivity extends AppCompatActivity {
                 LinearLayoutManager.HORIZONTAL, false);
         usersRecyclerView.setLayoutManager(usersLayoutManager);
 
-        usersAdapter = new PlayerCardListAdapter(unoCardClassArrayList, Player1GameScreenActivity.this);
+        usersAdapter = new PlayerCardListAdapter(thisPlayerCard, Player1GameScreenActivity.this);
         usersRecyclerView.setAdapter(usersAdapter);
+        //usersRecyclerView.setItemAnimator(new Slide());
 
         db = FirebaseFirestore.getInstance();
 
@@ -66,15 +67,31 @@ public class Player1GameScreenActivity extends AppCompatActivity {
                 if (snapshot != null && snapshot.exists()) {
                     //this is to check if someone has accepted the request for the game
                     gameDetailsClass = snapshot.toObject(GameDetailsClass.class);
-                    unoCardClassArrayList = new ArrayList<>();
-                    unoCardClassArrayList = gameDetailsClass.player1Cards;
-
+                    // before adding new card in empty object it needed to be clean and then added
+                    Log.d(TAG, "onEvent: in player1GameScreenActivity, player1 got cards=>"+gameDetailsClass.player1Cards);
+                    thisPlayerCard.clear();
+                    thisPlayerCard.addAll(gameDetailsClass.player1Cards);
                     usersAdapter.notifyDataSetChanged();
+                    Log.d(TAG, "onEvent: in player1GameScreenActivity, adapter has items=>>"+usersAdapter.getItemCount());
                 } else {
                     System.out.print("Current data: null");
                 }
             }
         });
+
+    }
+
+    @Override
+    public void PlayCard(int postion) {
+        // what ever you want to do after user clicker on car
+
+        UnoCardClass card = thisPlayerCard.remove(postion);
+        Toast.makeText(this, "you played=>"+card, Toast.LENGTH_SHORT).show();
+        usersAdapter.notifyDataSetChanged();
+
+        //card is user played card
+
+        //you need to block recycler view once player played
 
     }
 }
