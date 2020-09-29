@@ -32,6 +32,10 @@ public class LoadGameActivity extends AppCompatActivity {
     private String chatRoomName;
     private GameDetailsClass gameDetailsClass;
 
+    ///handler are global to remove them whenever we go out of activity
+    Handler startGameHandler = null;
+    Runnable startGameRunnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,8 +62,8 @@ public class LoadGameActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful()){
                                     attachListenerToGame();
-                                    Handler handler=new Handler();
-                                    handler.postDelayed(new Runnable() {
+
+                                    startGameRunnable = new Runnable() {
                                         @Override
                                         public void run() {
                                             Toast.makeText(LoadGameActivity.this, "Sorry No Players found at this time. Please try again later", Toast.LENGTH_SHORT).show();
@@ -69,7 +73,9 @@ public class LoadGameActivity extends AppCompatActivity {
 
                                             finish();
                                         }
-                                    },30000);
+                                    };
+                                    startGameHandler = new Handler();
+                                    startGameHandler.postDelayed(startGameRunnable,30000);
                                 }
                                 else {
                                     hideProgressBarDialog();
@@ -194,6 +200,8 @@ public class LoadGameActivity extends AppCompatActivity {
                             intent.putExtra("chatRoomName",chatRoomName);
                             intent.putExtra("gameDetails",gameDetailsClass);
                             startActivity(intent);
+                            // added finish as there is no need of this activity any more
+                            finish();
                         }
                         else {
                             hideProgressBarDialog();
@@ -223,5 +231,15 @@ public class LoadGameActivity extends AppCompatActivity {
     public void hideProgressBarDialog()
     {
         progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // this wil remove handler wherever user leaves this activity
+        if(startGameHandler!=null){
+            startGameHandler.removeCallbacks(startGameRunnable);
+        }
+
     }
 }

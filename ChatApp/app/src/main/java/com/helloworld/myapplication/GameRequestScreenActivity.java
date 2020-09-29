@@ -138,6 +138,8 @@ public class GameRequestScreenActivity extends AppCompatActivity {
                                     intent.putExtra("chatRoomName",chatRoomName);
                                     intent.putExtra("gameDetails",gameDetailsClass);
                                     startActivity(intent);
+                                    // added finish as there is no need of this activity any more
+                                    finish();
                                 }
                             }else{
                                 Toast.makeText(GameRequestScreenActivity.this, "This game is not available anymore", Toast.LENGTH_SHORT).show();

@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -49,11 +50,17 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
     boolean isUno=false;
     String colorName;
     boolean isWildCard=false;
+    // handler addded for monitoring if user plays in 1 minute/30 second or not
+    private Runnable gameCountDownRunnable;
+    private Handler gameCountDownHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player2_game_screen);
+
+        /// initializing handler
+        InitializeHandler();
 
         //Adding listener to the document for playing
         usersRecyclerView = (RecyclerView) findViewById(R.id.playerCardRecyclerView);
@@ -338,16 +345,18 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
         if(card.color.equals("black") || card.number == 10){
             if (card.number <= 4){
                 tv.setText("+4");
-                //holder.tv.setTop(5);
-                //tv.setPadding(0,10,0,0);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,45);
+                //tv.setTop(100);
+                tv.setPadding(0,85,0,0);
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,85);
             }else{
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,40);
-                //tv.setPadding(0,30,0,0);
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,60);
+                //tv.setTop(100);
+                tv.setPadding(0,110,0,0);
                 tv.setText("skip");
             }
         }else{
             tv.setText(""+card.number);
+            //tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,100);
         }
     }
 
@@ -483,6 +492,29 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
             }
         });
         builderSingle.show();
+    }
+
+    public void InitializeHandler(){
+        gameCountDownRunnable = new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(Player2GameScreenActivity.this, "No mover for 30 seconds game is going to finished", Toast.LENGTH_SHORT).show();
+                //have to delete that request from the firestore
+                //deleteGameRequest
+
+                finish();
+            }
+        };
+        gameCountDownHandler = new Handler();
+        //gameCountDownHandler.postDelayed(gameCountDownRunnable,30000);
+    }
+
+    public void startgameCountDownHandler(){
+        gameCountDownHandler.postDelayed(gameCountDownRunnable,30000);
+    }
+
+    public void stopgameCountDownHandler(){
+        gameCountDownHandler.removeCallbacks(gameCountDownRunnable);
     }
 
 //    public void displayPickedColor(String color){
