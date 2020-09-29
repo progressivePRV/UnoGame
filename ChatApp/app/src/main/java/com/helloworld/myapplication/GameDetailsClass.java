@@ -6,10 +6,14 @@ import java.util.ArrayList;
 public class GameDetailsClass implements Serializable {
     String player1Id;
     String player2Id;
+    String player1Name;
+    String player2Name;
     ArrayList<String> rejectedPlayers = new ArrayList<>();
     ArrayList<UnoCardClass> deckCards = new ArrayList<>();
     ArrayList<UnoCardClass> player1Cards = new ArrayList<>();
     ArrayList<UnoCardClass> player2Cards = new ArrayList<>();
+    ArrayList<UnoCardClass> discardCards = new ArrayList<>();
+    String turn;
 
     //can be requested, inprogress, draw, won - PlayerID
     String gameState;
@@ -70,6 +74,22 @@ public class GameDetailsClass implements Serializable {
         this.gameState = gameState;
     }
 
+    public ArrayList<UnoCardClass> getDiscardCards() {
+        return discardCards;
+    }
+
+    public void setDiscardCards(ArrayList<UnoCardClass> discardCards) {
+        this.discardCards = discardCards;
+    }
+
+    public String getTurn() {
+        return turn;
+    }
+
+    public void setTurn(String turn) {
+        this.turn = turn;
+    }
+
     @Override
     public String toString() {
         return "GameDetailsClass{" +
@@ -80,6 +100,8 @@ public class GameDetailsClass implements Serializable {
                 ", player1Cards=" + player1Cards +
                 ", player2Cards=" + player2Cards +
                 ", gameState='" + gameState + '\'' +
+                ", discardCards='" + discardCards + '\'' +
+                ", turn='" + turn + '\'' +
                 '}';
     }
 }

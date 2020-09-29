@@ -66,7 +66,8 @@ public class PlayerCardListAdapter extends RecyclerView.Adapter<PlayerCardListAd
                 holder.tv.setTextColor(Color.argb(255,255,242,0));
                 break;
             default:
-                holder.cardView.setCardBackgroundColor(Color.BLACK);
+                //holder.cardView.setCardBackgroundColor(Color.BLACK);
+                holder.cardView.setBackgroundResource(R.drawable.black_square);
                 holder.tv.setTextColor(Color.WHITE);
         }
         if(card.color.equals("black") || card.number == 10){

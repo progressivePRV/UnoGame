@@ -486,6 +486,7 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatMessageAd
                 //Here the request will be added to the firebase so the other users will be listening
                 GameDetailsClass gameDetails = new GameDetailsClass();
                 gameDetails.player1Id = user.uid;
+                gameDetails.player1Name = user.firstName+" "+user.lastName;
                 gameDetails.gameState = "REQUESTED";
                 Intent intent = new Intent(ChatRoomActivity.this, LoadGameActivity.class);
                 intent.putExtra("chatRoomName",chatRoomName);

@@ -22,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class LoadGameActivity extends AppCompatActivity {
@@ -168,6 +169,9 @@ public class LoadGameActivity extends AppCompatActivity {
             unoCardClassArrayList.remove(0); // after removing zeroth item nnow 1st will be zeroth item
         }
 
+        gameDetailsClass.discardCards = new ArrayList<>(Arrays.asList(unoCardClassArrayList.get(0)));
+        unoCardClassArrayList.remove(0);
+        gameDetailsClass.turn="player1";
         gameDetailsClass.deckCards = unoCardClassArrayList;
 
         db.collection("ChatRoomList")
@@ -181,7 +185,7 @@ public class LoadGameActivity extends AppCompatActivity {
                         if(task.isSuccessful()){
                             hideProgressBarDialog();
                             //here the deck is ready. So both the palyers have to go to the gameScreenactivtiy
-                            Intent intent = new Intent(LoadGameActivity.this, Player2GameScreenActivity.class);
+                            Intent intent = new Intent(LoadGameActivity.this, Player1GameScreenActivity.class);
                             intent.putExtra("chatRoomName",chatRoomName);
                             intent.putExtra("gameDetails",gameDetailsClass);
                             startActivity(intent);
