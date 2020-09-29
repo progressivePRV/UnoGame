@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +31,7 @@ public class GameRequestScreenActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private FirebaseFirestore db;
     boolean isYesClicked = false;
+    TextView requestedPlayerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,9 @@ public class GameRequestScreenActivity extends AppCompatActivity {
         chatRoomName = getIntent().getExtras().getString("chatRoomName");
         gameDetailsClass = (GameDetailsClass) getIntent().getExtras().getSerializable("GameDetailsClass");
         user = (UserProfile) getIntent().getExtras().getSerializable("userProfile");
+
+        requestedPlayerName = findViewById(R.id.requestedPlayerName);
+        requestedPlayerName.setText(gameDetailsClass.player1Name);
 
         attachListenerToGame();
 

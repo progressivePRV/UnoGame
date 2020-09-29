@@ -70,8 +70,8 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
 
         player1Name=findViewById(R.id.textViewPlayer1Name);
         player2Name=findViewById(R.id.textViewPlayer2Name);
-        player1Name.setText("Player 1");
-        player2Name.setText("Player 2");
+        player1Name.setText(gameDetailsClass.player1Name);
+        player2Name.setText(gameDetailsClass.player2Name);
 
         DocumentReference docRef = db.collection("ChatRoomList")
                 .document(chatRoomName)
