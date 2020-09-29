@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +31,7 @@ public class GameRequestScreenActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private FirebaseFirestore db;
     boolean isYesClicked = false;
+    TextView requestedPlayerName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,9 @@ public class GameRequestScreenActivity extends AppCompatActivity {
         chatRoomName = getIntent().getExtras().getString("chatRoomName");
         gameDetailsClass = (GameDetailsClass) getIntent().getExtras().getSerializable("GameDetailsClass");
         user = (UserProfile) getIntent().getExtras().getSerializable("userProfile");
+
+        requestedPlayerName = findViewById(R.id.requestedPlayerName);
+        requestedPlayerName.setText(gameDetailsClass.player1Name);
 
         attachListenerToGame();
 
@@ -61,6 +66,7 @@ public class GameRequestScreenActivity extends AppCompatActivity {
             public void onClick(View v) {
                 isYesClicked = true;
                 gameDetailsClass.player2Id = user.uid;
+                gameDetailsClass.player2Name=user.firstName+" "+user.lastName;
                 gameDetailsClass.gameState = "IN_PROGRESS";
                 showProgressBarDialog();
                 db.collection("ChatRoomList")
@@ -97,7 +103,7 @@ public class GameRequestScreenActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if(!isYesClicked){
-                    Toast.makeText(GameRequestScreenActivity.this, "Ride rejected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GameRequestScreenActivity.this, "Game rejected", Toast.LENGTH_SHORT).show();
                     addRejectedPlayer();
                 }
             }
@@ -128,7 +134,7 @@ public class GameRequestScreenActivity extends AppCompatActivity {
                                 if(gameDetailsClass.deckCards.size() > 0){
                                     hideProgressBarDialog();
                                     Toast.makeText(GameRequestScreenActivity.this, "Game will be started soon.. Preparing the game", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(GameRequestScreenActivity.this, Player1GameScreenActivity.class);
+                                    Intent intent = new Intent(GameRequestScreenActivity.this, Player2GameScreenActivity.class);
                                     intent.putExtra("chatRoomName",chatRoomName);
                                     intent.putExtra("gameDetails",gameDetailsClass);
                                     startActivity(intent);

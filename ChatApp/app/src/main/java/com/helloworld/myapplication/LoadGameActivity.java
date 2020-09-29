@@ -22,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class LoadGameActivity extends AppCompatActivity {
@@ -120,43 +121,62 @@ public class LoadGameActivity extends AppCompatActivity {
     public void startGame(){
         UnoCardClass unoCardClass;
         ArrayList<UnoCardClass> unoCardClassArrayList = new ArrayList<>();
+
+        //10 number is equal to skip of that no.
+
         //for red color
-        for(int i=1; i<=9; i++){
+        for(int i=1; i<=10; i++){
             unoCardClass = new UnoCardClass();
             unoCardClass.color = "red";
             unoCardClass.number = i;
             unoCardClassArrayList.add(unoCardClass);
         }
         //for yellow color
-        for(int i=1; i<=9; i++){
+        for(int i=1; i<=10; i++){
             unoCardClass = new UnoCardClass();
             unoCardClass.color = "yellow";
             unoCardClass.number = i;
             unoCardClassArrayList.add(unoCardClass);
         }
         //for green color
-        for(int i=1; i<=9; i++){
+        for(int i=1; i<=10; i++){
             unoCardClass = new UnoCardClass();
             unoCardClass.color = "green";
             unoCardClass.number = i;
             unoCardClassArrayList.add(unoCardClass);
         }
         //for blue color
-        for(int i=1; i<=9; i++){
+        for(int i=1; i<=10; i++){
             unoCardClass = new UnoCardClass();
             unoCardClass.color = "blue";
             unoCardClass.number = i;
             unoCardClassArrayList.add(unoCardClass);
         }
 
+        //for 4 black draw 4 s
+        for(int i=1; i<=4; i++){
+            unoCardClass = new UnoCardClass();
+            unoCardClass.color = "black";
+            unoCardClass.number = i;
+            unoCardClassArrayList.add(unoCardClass);
+        }
+
         Collections.shuffle(unoCardClassArrayList);
+
         for(int i=0; i<7; i++){
             gameDetailsClass.player1Cards.add(unoCardClassArrayList.get(0));
             gameDetailsClass.player2Cards.add(unoCardClassArrayList.get(1));
             unoCardClassArrayList.remove(0);
-            unoCardClassArrayList.remove(1);
+            unoCardClassArrayList.remove(0); // after removing zeroth item nnow 1st will be zeroth item
         }
 
+        while(unoCardClassArrayList.get(0).number==10 || unoCardClassArrayList.get(0).color.equals("black")){
+            Collections.shuffle(unoCardClassArrayList);
+        }
+
+        gameDetailsClass.discardCards = new ArrayList<>(Arrays.asList(unoCardClassArrayList.get(0)));
+        unoCardClassArrayList.remove(0);
+        gameDetailsClass.turn="player1";
         gameDetailsClass.deckCards = unoCardClassArrayList;
 
         db.collection("ChatRoomList")
@@ -170,7 +190,7 @@ public class LoadGameActivity extends AppCompatActivity {
                         if(task.isSuccessful()){
                             hideProgressBarDialog();
                             //here the deck is ready. So both the palyers have to go to the gameScreenactivtiy
-                            Intent intent = new Intent(LoadGameActivity.this, Player2GameScreenActivity.class);
+                            Intent intent = new Intent(LoadGameActivity.this, Player1GameScreenActivity.class);
                             intent.putExtra("chatRoomName",chatRoomName);
                             intent.putExtra("gameDetails",gameDetailsClass);
                             startActivity(intent);
