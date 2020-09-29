@@ -162,11 +162,16 @@ public class LoadGameActivity extends AppCompatActivity {
         }
 
         Collections.shuffle(unoCardClassArrayList);
+
         for(int i=0; i<7; i++){
             gameDetailsClass.player1Cards.add(unoCardClassArrayList.get(0));
             gameDetailsClass.player2Cards.add(unoCardClassArrayList.get(1));
             unoCardClassArrayList.remove(0);
             unoCardClassArrayList.remove(0); // after removing zeroth item nnow 1st will be zeroth item
+        }
+
+        while(unoCardClassArrayList.get(0).number==10 || unoCardClassArrayList.get(0).color.equals("black")){
+            Collections.shuffle(unoCardClassArrayList);
         }
 
         gameDetailsClass.discardCards = new ArrayList<>(Arrays.asList(unoCardClassArrayList.get(0)));

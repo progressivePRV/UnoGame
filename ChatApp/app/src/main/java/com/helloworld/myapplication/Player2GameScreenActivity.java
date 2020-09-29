@@ -7,12 +7,15 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +47,8 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
     TextView player1Name;
     TextView player2Name;
     boolean isUno=false;
+    String colorName;
+    boolean isWildCard=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,10 +117,28 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
 
                         player2Name.setTextColor(Color.argb(255,34,177,76));
                         player2Name.setTypeface(null,Typeface.BOLD);
-
-                        //findViewById(R.id.button_skipTurnPlayer2).setEnabled(true);
-                        findViewById(R.id.Uno_image_deck5).setEnabled(true);
+                        if(gameDetailsClass.plusFourCurrentColor!=null && !gameDetailsClass.plusFourCurrentColor.isEmpty() && !isWildCard){
+                            findViewById(R.id.Uno_image_deck5).setEnabled(false);
+                            findViewById(R.id.button_skipTurnPlayer2).setEnabled(true);
+                        }
+                        else{
+                            findViewById(R.id.Uno_image_deck5).setEnabled(true);
+                            findViewById(R.id.button_skipTurnPlayer2).setEnabled(false);
+                        }
                     }
+
+                    if(gameDetailsClass.plusFourCurrentColor!=null && !gameDetailsClass.plusFourCurrentColor.isEmpty()){
+                        isWildCard=true;
+                        TextView wildCardColor = findViewById(R.id.textViewWildCardColor1);
+                        wildCardColor.setText("Wild Card Color: "+gameDetailsClass.plusFourCurrentColor);
+                        //displayPickedColor(gameDetailsClass.plusFourCurrentColor);
+                    }
+                    else{
+                        isWildCard=false;
+                        TextView wildCardColor = findViewById(R.id.textViewWildCardColor1);
+                        wildCardColor.setText("");
+                    }
+
 
                     if(gameDetailsClass.player1Cards!=null && gameDetailsClass.player1Cards.size()==1){
                         if(!isUno){
@@ -224,13 +247,13 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
                         .collection("UnoGame")
                         .document(gameDetailsClass.player1Id);
 
-                docRef.update("player2Cards", FieldValue.arrayRemove(card)).addOnSuccessListener(Player2GameScreenActivity.this, new OnSuccessListener<Void>() {
+                docRef.update("player2Cards", FieldValue.arrayRemove(card),"plusFourCurrentColor",null).addOnSuccessListener(Player2GameScreenActivity.this, new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         docRef.update("discardCards",FieldValue.arrayUnion(card)).addOnSuccessListener(Player2GameScreenActivity.this, new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                if(card.number!=10){
+                                if(card.number!=10 && !card.color.equals("black")){
                                     docRef.update("turn","player1").addOnSuccessListener(Player2GameScreenActivity.this, new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void aVoid) {
@@ -243,9 +266,14 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
                                         }
                                     });
                                 }
-                                else{
+                                else if(card.number==10){
+
                                     findViewById(R.id.button_skipTurnPlayer2).setEnabled(false);
                                     Toast.makeText(Player2GameScreenActivity.this, "you played=>"+card+" You can play again", Toast.LENGTH_SHORT).show();
+
+                                }
+                                else if(card.color.equals("black")){
+                                    setColorAndTransferTurn(docRef,gameDetailsClass);
                                 }
                             }
                         }).addOnFailureListener(Player2GameScreenActivity.this, new OnFailureListener() {
@@ -396,10 +424,78 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
             }
         }
 
-//        if(topCard.color.equals("black")){
-//
-//        }
+        if(topCard.color.equals("black")){
+            if(!playingCard.color.equals("black") && !playingCard.color.equals(gameDetailsClass.plusFourCurrentColor)){
+                return false;
+            }
+        }
 
         return true;
     }
+
+    public void setColorAndTransferTurn(DocumentReference docRef,GameDetailsClass gameDetailsClass){
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(Player2GameScreenActivity.this);
+        builderSingle.setTitle("Select One Color");
+        builderSingle.setCancelable(false);
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(Player2GameScreenActivity.this, android.R.layout.simple_list_item_1);
+        arrayAdapter.add("red");
+        arrayAdapter.add("green");
+        arrayAdapter.add("blue");
+        arrayAdapter.add("yellow");
+
+        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                colorName = arrayAdapter.getItem(which);
+
+                gameDetailsClass.plusFourCurrentColor=colorName;
+                gameDetailsClass.turn="player1";
+
+                if(gameDetailsClass.deckCards.size()<4){
+                    UnoCardClass topCard=gameDetailsClass.discardCards.get(gameDetailsClass.discardCards.size()-1);
+                    gameDetailsClass.discardCards.remove(gameDetailsClass.discardCards.size()-1);
+                    Collections.shuffle(gameDetailsClass.discardCards);
+                    gameDetailsClass.deckCards.addAll(gameDetailsClass.discardCards);
+                    gameDetailsClass.discardCards=new ArrayList<>(Arrays.asList(topCard));
+                }
+
+                if(gameDetailsClass.deckCards.size()>=4){
+                    for(int i=0;i<4;i++){
+                        gameDetailsClass.player1Cards.add(gameDetailsClass.deckCards.get(0));
+                        gameDetailsClass.deckCards.remove(0);
+                    }
+                }
+
+                docRef.set(gameDetailsClass).addOnSuccessListener(Player2GameScreenActivity.this, new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(Player2GameScreenActivity.this, "You selected "+colorName+" color", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                }).addOnFailureListener(Player2GameScreenActivity.this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(Player2GameScreenActivity.this, "Could not change color on card", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+        });
+        builderSingle.show();
+    }
+
+//    public void displayPickedColor(String color){
+//        AlertDialog.Builder builderSingle = new AlertDialog.Builder(Player2GameScreenActivity.this);
+//        builderSingle.setMessage("Color "+color+" was selected on wild card draw 4");
+//
+//        builderSingle.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        builderSingle.show();
+//    }
 }

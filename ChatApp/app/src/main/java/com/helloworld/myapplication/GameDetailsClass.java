@@ -14,6 +14,7 @@ public class GameDetailsClass implements Serializable {
     ArrayList<UnoCardClass> player2Cards = new ArrayList<>();
     ArrayList<UnoCardClass> discardCards = new ArrayList<>();
     String turn;
+    String plusFourCurrentColor;
 
     //can be requested, inprogress, draw, won - PlayerID
     String gameState;
@@ -106,6 +107,14 @@ public class GameDetailsClass implements Serializable {
         this.player2Name = player2Name;
     }
 
+    public String getPlusFourCurrentColor() {
+        return plusFourCurrentColor;
+    }
+
+    public void setPlusFourCurrentColor(String plusFourCurrentColor) {
+        this.plusFourCurrentColor = plusFourCurrentColor;
+    }
+
     @Override
     public String toString() {
         return "GameDetailsClass{" +
@@ -120,6 +129,7 @@ public class GameDetailsClass implements Serializable {
                 ", turn='" + turn + '\'' +
                 ", player1Name='" + player1Name + '\'' +
                 ", player2Name='" + player2Name + '\'' +
+                ", plusFourCurrentColor='" + plusFourCurrentColor + '\'' +
                 '}';
     }
 }
