@@ -1,6 +1,7 @@
 package com.helloworld.myapplication;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -18,12 +20,19 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
 public class Driver_list extends AppCompatActivity implements rvAdapterForDriverList.ToInteractWithDriverList {
 
+    private static final String TAG = "okay";
     ArrayList<UserProfile> drivers = new ArrayList<>();
     RecyclerView rv;
     RecyclerView.Adapter rvAdapter;
@@ -44,7 +53,8 @@ public class Driver_list extends AppCompatActivity implements rvAdapterForDriver
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         db = FirebaseFirestore.getInstance();
 
-        drivers = (ArrayList<UserProfile>) getIntent().getSerializableExtra("drivers");
+        Log.d(TAG, "onCreate: excplicitly commenting driver to get from intent");
+        //drivers = (ArrayList<UserProfile>) getIntent().getSerializableExtra("drivers");
 
         rv = findViewById(R.id.rv_in_Driver_list);
         rv.setHasFixedSize(true);
@@ -55,6 +65,8 @@ public class Driver_list extends AppCompatActivity implements rvAdapterForDriver
 
         chatRoomName = getIntent().getExtras().getString("chatRoomName");
         rides = (RequestedRides) getIntent().getExtras().getSerializable("updateRideDetails");
+
+        DriverListener();
 
         findViewById(R.id.buttonCancelRide).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,6 +129,41 @@ public class Driver_list extends AppCompatActivity implements rvAdapterForDriver
         AlertDialog alert11 = builder1.create();
         alert11.show();
 
+    }
+
+    void DriverListener(){
+        Log.d(TAG, "DriverListener: called in driver_list");
+        DocumentReference docRef = db.collection("ChatRoomList")
+                .document(chatRoomName)
+                .collection("Requested Rides")
+                .document(rides.riderId);
+
+        docRef.addSnapshotListener(Driver_list.this, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException error) {
+                Log.d(TAG, "onEvent: event occured while listening for requestrides");
+                if (error != null) {
+                    Log.d(TAG, error+"");
+                    return;
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    rides = snapshot.toObject(RequestedRides.class);
+                    // acceptedDrivers = new ArrayList<>();
+                    drivers.clear();
+                    drivers.addAll(rides.drivers);
+                    Log.d(TAG, "onEvent: driver size"+drivers.size());
+                    Log.d(TAG, "onEvent: !drivers.isEmpty()=>"+!drivers.isEmpty());
+                    if (!drivers.isEmpty()){
+                        Log.d(TAG, "onEvent: it should notify data set changed now");
+                        rvAdapter.notifyDataSetChanged();
+                        Log.d(TAG, "onEvent: items in rv adapter in driverslist=>"+rvAdapter.getItemCount());
+                    }
+                } else {
+                    Log.d(TAG, "onEvent: got nothing in requestride in driverlist activity");
+                }
+            }
+        });
     }
 
 }

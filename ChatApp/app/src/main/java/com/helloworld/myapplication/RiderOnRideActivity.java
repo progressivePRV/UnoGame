@@ -104,7 +104,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Log.d(TAG, "onCreate: called for Rider onRide Activty");
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
@@ -163,6 +163,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
      */
     // [START maps_current_place_location_permission]
     private void getLocationPermission() {
+        Log.d(TAG, "getLocationPermission: called in rideronrid activty");
         /*
          * Request location permission, so that we can get the location of the
          * device. The result of the permission request is handled by a callback,
@@ -184,6 +185,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
      */
     // [START maps_current_place_get_device_location]
     private void getDeviceLocation() {
+        Log.d(TAG, "getDeviceLocation: called in rideronrid activty");
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
@@ -252,6 +254,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
      */
     // [START maps_current_place_update_location_ui]
     private void updateLocationUI() {
+        Log.d(TAG, "updateLocationUI: called in rideronrid activty");
         if (mMap == null) {
             return;
         }
@@ -285,6 +288,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d(TAG, "onMapReady: called in rideronrid activty");
         mMap = googleMap;
 
         LatLngBounds.Builder latlngBuilder = new LatLngBounds.Builder();
@@ -325,6 +329,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
+                Log.d(TAG, "onMapLoaded: called in rideronrid activty");
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200));
                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200));
                 //set animator for dirver location
@@ -357,13 +362,14 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
 
     @Override
     public void onBackPressed() {
-
+        Log.d(TAG, "onBackPressed: called in rideronrid activty");
         AlertDialog.Builder builder1 = new AlertDialog.Builder(RiderOnRideActivity.this);
         builder1.setMessage("Are you sure you want to cancel this ride?");
         builder1.setPositiveButton(
                 "Yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        Log.d(TAG, "onClick: called in rideronrid activty for pressing yes for=> Areyou sure you want to cancel this ride");
                         db.collection("ChatRoomList").document(chatRoomName)
                                 .collection("Requested Rides")
                                 .document(rider.riderId)
@@ -397,6 +403,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
     //below function are added for driver location updates
 
     void RequestRideUpdateListner(){
+        Log.d(TAG, "RequestRideUpdateListner: called in rideronrid activty");
         DocumentReference docRiderDriverRef = db.collection("ChatRoomList")
                 .document(chatRoomName)
                 .collection("Requested Rides")
@@ -438,6 +445,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
     }
 
     void SetAnimatoinForDriver(Marker driverMarker){
+        Log.d(TAG, "SetAnimatoinForDriver: called in rideronrid activty");
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
         Projection proj = mMap.getProjection();
@@ -454,6 +462,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
     }
 
     void UpdatemarkerLocation(RequestedRides request){
+        Log.d(TAG, "UpdatemarkerLocation: called in rideronrid activty");
         double lng = request.driverLocation.get(1);
         double lat = request.driverLocation.get(0);
         driverMarker.setPosition(new LatLng(lat, lng));
@@ -546,6 +555,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
 
     //adding function to add data in previous rides
     void AddDataToPreviousRide(RequestedRides request){
+        Log.d(TAG, "AddDataToPreviousRide: called in rideronrid activty");
         PreviousRide ride = new PreviousRide();
         ride.driverID = request.driverId;
         ride.riderID = request.riderId;
@@ -572,6 +582,7 @@ public class RiderOnRideActivity extends FragmentActivity implements OnMapReadyC
     }
     //adding function to delete request ride
     void DeleteRequestRide(RequestedRides request){
+        Log.d(TAG, "DeleteRequestRide: called in rideronrid activty");
         db.collection("ChatRoomList")
                 .document(chatRoomName)
                 .collection("Requested Rides")

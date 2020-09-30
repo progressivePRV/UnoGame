@@ -71,6 +71,9 @@ public class AskForARide extends AppCompatActivity {
     ImageView toImage;
     ImageView moreImage;
     int cnt;
+    ///update for listening fro one driver in this activity
+    Handler progressBarHandler;
+    Runnable r1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,6 +225,15 @@ public class AskForARide extends AppCompatActivity {
                     updateRideDetails = snapshot.toObject(RequestedRides.class);
                    // acceptedDrivers = new ArrayList<>();
                     acceptedDrivers = updateRideDetails.drivers;
+                    if (!acceptedDrivers.isEmpty()){
+                        progressBarHandler.removeCallbacks(r1);
+                        progressDialog.dismiss();
+                        Intent i = new Intent(AskForARide.this, Driver_list.class);
+                        i.putExtra("drivers",acceptedDrivers);
+                        i.putExtra("updateRideDetails", updateRideDetails);
+                        i.putExtra("chatRoomName",chatRoomName);
+                        startActivityForResult(i, 150);
+                    }
                 } else {
                     System.out.print("Current data: null");
                 }
@@ -331,13 +343,14 @@ public class AskForARide extends AppCompatActivity {
         progressDialog.show();
 
         //Handler is set for 30 seconds for the driver to accept the invitation
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        progressBarHandler = new Handler();
+        r1 = new Runnable() {
             public void run() {
                 progressDialog.dismiss();
                 getToDriverListActivity();
             }
-        }, 30000);
+        };
+        progressBarHandler.postDelayed(r1, 30000);
     }
 
 //    @Override
@@ -352,11 +365,12 @@ public class AskForARide extends AppCompatActivity {
             Toast.makeText(this, "Sorry, No Driver is available at this moment", Toast.LENGTH_SHORT).show();
             deleteRequestedRide();
         }else{
-            Intent i = new Intent(this, Driver_list.class);
-            i.putExtra("drivers",acceptedDrivers);
-            i.putExtra("updateRideDetails", updateRideDetails);
-            i.putExtra("chatRoomName",chatRoomName);
-            startActivityForResult(i, 150);
+//            Intent i = new Intent(this, Driver_list.class);
+//            i.putExtra("drivers",acceptedDrivers);
+//            i.putExtra("updateRideDetails", updateRideDetails);
+//            i.putExtra("chatRoomName",chatRoomName);
+//            startActivityForResult(i, 150);
+            Log.d(TAG, "getToDriverListActivity: stopping from going to driver list activity");
         }
     }
 
@@ -388,9 +402,7 @@ public class AskForARide extends AppCompatActivity {
     /// this is cure for activity leak from internet
     @Override
     protected void onStop() {
-        if(progressDialog!=null){
-            progressDialog.dismiss();
-        }
+        progressDialog.dismiss();
         super.onStop();
     }
 

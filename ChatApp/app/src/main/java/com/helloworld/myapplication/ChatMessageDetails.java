@@ -1,17 +1,19 @@
 package com.helloworld.myapplication;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChatMessageDetails {
+public class ChatMessageDetails implements Serializable {
     String Uid;
     String firstname;
     String Message;
     String date;
     HashMap<String,Boolean> likedUsers = new HashMap<String ,Boolean>();
     String imageUrl;
+    UserCurrentLocation userCurrentLocation=null;
 
     public String getUid() {
         return Uid;
@@ -31,6 +33,14 @@ public class ChatMessageDetails {
 
     public String getMessage() {
         return Message;
+    }
+
+    public UserCurrentLocation getUserCurrentLocation() {
+        return userCurrentLocation;
+    }
+
+    public void setUserCurrentLocation(UserCurrentLocation userCurrentLocation) {
+        this.userCurrentLocation = userCurrentLocation;
     }
 
     public void setMessage(String message) {
@@ -70,6 +80,7 @@ public class ChatMessageDetails {
                 ", date='" + date + '\'' +
                 ", likedUsers=" + likedUsers +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", userCurrentLocation='" + userCurrentLocation + '\'' +
                 '}';
     }
 }

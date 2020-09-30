@@ -56,8 +56,8 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
     boolean isWildCard=false;
     private ProgressDialog progressDialog;
     // handler addded for monitoring if user plays in 1 minute/30 second or not
-    private Runnable gameCountDownRunnable;
-    private Handler gameCountDownHandler;
+//    private Runnable gameCountDownRunnable;
+//    private Handler gameCountDownHandler;
 
     private CountDownTimer countDownTimer;
 
@@ -67,7 +67,7 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
         setContentView(R.layout.activity_player2_game_screen);
 
         /// initializing handler
-        InitializeHandler();
+//        InitializeHandler();
 
         //Adding listener to the document for playing
         usersRecyclerView = (RecyclerView) findViewById(R.id.playerCardRecyclerView);
@@ -598,28 +598,28 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
         builderSingle.show();
     }
 
-    public void InitializeHandler(){
-        gameCountDownRunnable = new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(Player2GameScreenActivity.this, "No mover for 30 seconds game is going to finished", Toast.LENGTH_SHORT).show();
-                //have to delete that request from the firestore
-                //deleteGameRequest
-
-                finish();
-            }
-        };
-        gameCountDownHandler = new Handler();
-        //gameCountDownHandler.postDelayed(gameCountDownRunnable,30000);
-    }
-
-    public void startgameCountDownHandler(){
-        gameCountDownHandler.postDelayed(gameCountDownRunnable,60000);
-    }
-
-    public void stopgameCountDownHandler(){
-        gameCountDownHandler.removeCallbacks(gameCountDownRunnable);
-    }
+//    public void InitializeHandler(){
+//        gameCountDownRunnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                Toast.makeText(Player2GameScreenActivity.this, "No mover for 30 seconds game is going to finished", Toast.LENGTH_SHORT).show();
+//                //have to delete that request from the firestore
+//                //deleteGameRequest
+//
+//                finish();
+//            }
+//        };
+//        gameCountDownHandler = new Handler();
+//        //gameCountDownHandler.postDelayed(gameCountDownRunnable,30000);
+//    }
+//
+//    public void startgameCountDownHandler(){
+//        gameCountDownHandler.postDelayed(gameCountDownRunnable,60000);
+//    }
+//
+//    public void stopgameCountDownHandler(){
+//        gameCountDownHandler.removeCallbacks(gameCountDownRunnable);
+//    }
 
 //    public void displayPickedColor(String color){
 //        AlertDialog.Builder builderSingle = new AlertDialog.Builder(Player2GameScreenActivity.this);

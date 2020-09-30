@@ -71,6 +71,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
@@ -110,6 +111,9 @@ public class OnRideActivity extends FragmentActivity implements OnMapReadyCallba
     TextView riderName;
     TextView pickUpLocation;
     TextView dropOffLocation;
+    Handler handler;
+    boolean stop;
+
 
     //variable for updating driver location
     Marker driverMarker;
@@ -139,6 +143,7 @@ public class OnRideActivity extends FragmentActivity implements OnMapReadyCallba
 
         setContentView(R.layout.activity_on_ride);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        stop=false;
 
         if (getIntent() != null && getIntent().getExtras() != null && getIntent().getExtras().get("requestedRide") != null) {
             SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -209,6 +214,7 @@ public class OnRideActivity extends FragmentActivity implements OnMapReadyCallba
                     // acceptedDrivers = new ArrayList<>();
                     if (updated.rideStatus.equals("CANCELLED")) {
                         //Then either the rider or the driver has cancelled it. so finishing this intent.
+                        stop=true;
                         Toast.makeText(OnRideActivity.this, "Sorry.. This ride has been cancelled..", Toast.LENGTH_LONG).show();
                         finish();
                     } else if (updated.rideStatus.equals("COMPLETED")) {
@@ -413,6 +419,7 @@ public class OnRideActivity extends FragmentActivity implements OnMapReadyCallba
                 "Yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        stop=true;
                         db.collection("ChatRoomList").document(chatRoomName)
                                 .collection("Requested Rides")
                                 .document(rider.riderId)
@@ -493,17 +500,20 @@ public class OnRideActivity extends FragmentActivity implements OnMapReadyCallba
                 .collection("Requested Rides")
                 .document(rider.riderId);
 
-        rideRequeat.update("driverLocation", driverLatLngArrList)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "onComplete: updated driver location in firebase");
-                        } else {
-                            Log.d(TAG, "onComplete: error while updating driver location in friebase");
+            rideRequeat.
+                    update("driverLocation", driverLatLngArrList)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                //Toast.makeText(OnRideActivity.this, "Here", Toast.LENGTH_SHORT).show();
+                                //driverLatLngArrList.clear();
+                                Log.d(TAG, "onComplete: updated driver location in firebase");
+                            } else {
+                                Log.d(TAG, "onComplete: error while updating driver location in friebase");
+                            }
                         }
-                    }
-                });
+                    });
     }
 
     void UpadteRideStatus() {
@@ -891,7 +901,7 @@ public class OnRideActivity extends FragmentActivity implements OnMapReadyCallba
     }
 
     private void tryAnimateMarkerForMoving(Marker driverMarker, LatLng fromLatLong, boolean b) {
-        final Handler handler = new Handler();
+        handler = new Handler();
         //final long start = SystemClock.uptimeMillis();
         Projection proj = mMap.getProjection();
         Point startPoint = proj.toScreenLocation(driverMarker.getPosition());
@@ -925,10 +935,13 @@ public class OnRideActivity extends FragmentActivity implements OnMapReadyCallba
                         driverMarker.setVisible(true);
                     }
                 } else {
-                    handler.postDelayed(this, 500);
+                    if(!stop){
+                        handler.postDelayed(this, 500);
+                    }
                 }
             }
         });
+
     }
     // implementaion of saved instance state is not done not think it as necessary at now
 

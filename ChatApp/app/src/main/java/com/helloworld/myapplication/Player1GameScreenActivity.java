@@ -55,8 +55,8 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
     private ProgressDialog progressDialog;
     boolean isWildCard=false;
     // handler addded for monitoring if user plays in 1 minute/30 second or not
-    private Runnable gameCountDownRunnable;
-    private Handler gameCountDownHandler;
+//    private Runnable gameCountDownRunnable;
+//    private Handler gameCountDownHandler;
 
     //CountDownTimer
     private CountDownTimer countDownTimer;
@@ -69,7 +69,7 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
         Log.d(TAG, "onCreate: called in Player1GameScreenActivity");
 
         /// initializing handler
-        InitializeHandler();
+//        InitializeHandler();
 
         //Adding listener to the document for playing
         usersRecyclerView = (RecyclerView) findViewById(R.id.playerCardRecyclerView);
@@ -108,7 +108,6 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
                 Toast.makeText(Player1GameScreenActivity.this, "This game is done as you have not moved in 1 minute", Toast.LENGTH_SHORT).show();
                 onBackUpdate();
                 //update it in the firestore and then finish the activity
-
             }
         };
 
@@ -604,28 +603,28 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
         builderSingle.show();
     }
 
-    public void InitializeHandler(){
-        gameCountDownRunnable = new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(Player1GameScreenActivity.this, "No mover for 30 seconds game is going to finished", Toast.LENGTH_SHORT).show();
-                //have to delete that request from the firestore
-                //deleteGameRequest
-
-                finish();
-            }
-        };
-        gameCountDownHandler = new Handler();
-        //gameCountDownHandler.postDelayed(gameCountDownRunnable,30000);
-    }
-
-    public void startgameCountDownHandler(){
-        gameCountDownHandler.postDelayed(gameCountDownRunnable,60000);
-    }
-
-    public void stopgameCountDownHandler(){
-        gameCountDownHandler.removeCallbacks(gameCountDownRunnable);
-    }
+//    public void InitializeHandler(){
+//        gameCountDownRunnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                Toast.makeText(Player1GameScreenActivity.this, "No mover for 30 seconds game is going to finished", Toast.LENGTH_SHORT).show();
+//                //have to delete that request from the firestore
+//                //deleteGameRequest
+//
+//                finish();
+//            }
+//        };
+//        gameCountDownHandler = new Handler();
+//        //gameCountDownHandler.postDelayed(gameCountDownRunnable,30000);
+//    }
+//
+//    public void startgameCountDownHandler(){
+//        gameCountDownHandler.postDelayed(gameCountDownRunnable,60000);
+//    }
+//
+//    public void stopgameCountDownHandler(){
+//        gameCountDownHandler.removeCallbacks(gameCountDownRunnable);
+//    }
 
 //    public void displayPickedColor(String color){
 //        AlertDialog.Builder builderSingle = new AlertDialog.Builder(Player1GameScreenActivity.this);

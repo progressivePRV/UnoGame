@@ -9,6 +9,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -94,6 +97,32 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
                     holder.ButtonMessageDelete.setVisibility(ImageButton.INVISIBLE);
                 }
 
+                if(chatMessageDetails.userCurrentLocation!=null && chatMessageDetails.userCurrentLocation.getLatitude()!=null){
+                    holder.chatRoomMessage.setTypeface(null,Typeface.BOLD_ITALIC);
+                    holder.chatRoomMessage.setTextColor(Color.BLUE);
+                    holder.chatRoomMessage.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
+
+                    holder.chatRoomMessage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            interact.displayLocation(chatMessageDetails);
+                        }
+                    });
+
+                }
+                else{
+                    holder.chatRoomMessage.setTypeface(Typeface.DEFAULT);
+                    holder.chatRoomMessage.setTextColor(Color.BLACK);
+                    holder.chatRoomMessage.setPaintFlags(0);
+
+                    holder.chatRoomMessage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        }
+                    });
+                }
+
                 if(chatMessageDetails.likedUsers.containsKey(mAuth.getUid())){
                     holder.ButtonMessageFavouriteON.setVisibility(ImageButton.VISIBLE);
                     holder.ButtonMessageFavorites.setVisibility(ImageButton.INVISIBLE);
@@ -166,6 +195,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     public interface InteractWithRecyclerView{
         public void getDetails(ChatMessageDetails chatMessageDetails);
         public void getItemPosition(int position, ChatMessageDetails chatMessageDetails);
+        public void displayLocation(ChatMessageDetails chatMessageDetails);
     }
 }
 

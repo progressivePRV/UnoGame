@@ -33,7 +33,6 @@
         <activity android:name=".Player1GameScreenActivity" />
         <activity android:name=".GameRequestScreenActivity" />
         <activity android:name=".LoadGameActivity" />
-        <activity android:name=".Driver_list" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -46,6 +45,13 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <activity
+            android:name=".ConfirmLocationActivity"
+            android:label="@string/title_activity_test"></activity>
+        <activity
+            android:name=".UserLiveLocationActivity"
+            android:label="@string/title_activity_user_live_location" />
+        <activity android:name=".Driver_list" />
         <activity
             android:name=".RiderOnRideActivity"
             android:label="@string/title_activity_rider_on_ride" />
