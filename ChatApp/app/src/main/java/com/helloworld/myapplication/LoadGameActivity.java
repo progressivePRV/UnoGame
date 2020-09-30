@@ -69,9 +69,8 @@ public class LoadGameActivity extends AppCompatActivity {
                                             Toast.makeText(LoadGameActivity.this, "Sorry No Players found at this time. Please try again later", Toast.LENGTH_SHORT).show();
 
                                             //have to delete that request from the firestore
-                                            //deleteGameRequest
-
-                                            finish();
+                                            //update the request to completed
+//                                            deleteGameRequest();
                                         }
                                     };
                                     startGameHandler = new Handler();
@@ -93,6 +92,28 @@ public class LoadGameActivity extends AppCompatActivity {
         });
     }
 
+    //updateGameRequest will update the game request to completed so that the user will no longer get the message.
+    public void deleteGameRequest(){
+        db.collection("ChatRoomList").document(chatRoomName)
+                .collection("UnoGame")
+                .document(gameDetailsClass.player1Id)
+                .delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(LoadGameActivity.this, "Request deleted!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                finish();
+                Toast.makeText(LoadGameActivity.this, "Some error occured. Please try again", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
     public void attachListenerToGame(){
         //Adding snapshot listener for accepted players so if the user has accepted to the firestore then the game should progress
         DocumentReference docRef = db.collection("ChatRoomList")
@@ -111,11 +132,17 @@ public class LoadGameActivity extends AppCompatActivity {
                 if (snapshot != null && snapshot.exists()) {
                     //this is to check if someone has accepted the request for the game
                     gameDetailsClass = snapshot.toObject(GameDetailsClass.class);
+
                     if(gameDetailsClass.gameState.equals("IN_PROGRESS")&& gameDetailsClass.player2Id!=null){
                         Toast.makeText(LoadGameActivity.this, "Game will be started soon.. Preparing the game", Toast.LENGTH_SHORT).show();
                         if(gameDetailsClass.deckCards.size() == 0) {
                             startGame();
                         }
+                    }
+
+                    if(gameDetailsClass.gameState.equals("COMPLETED")){
+                        //finishing the game as the game state is completed
+                        finish();
                     }
                 } else {
                     System.out.print("Current data: null");

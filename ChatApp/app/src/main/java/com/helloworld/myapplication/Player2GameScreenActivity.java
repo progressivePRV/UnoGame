@@ -8,10 +8,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
@@ -20,8 +22,10 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -50,9 +54,12 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
     boolean isUno=false;
     String colorName;
     boolean isWildCard=false;
+    private ProgressDialog progressDialog;
     // handler addded for monitoring if user plays in 1 minute/30 second or not
     private Runnable gameCountDownRunnable;
     private Handler gameCountDownHandler;
+
+    private CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +92,29 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
         player1Name.setText(gameDetailsClass.player1Name);
         player2Name.setText(gameDetailsClass.player2Name);
 
+
+        countDownTimer = new CountDownTimer(60*1000, 1000) {
+            @Override
+            public void onTick(long l) {
+                long minute = l/1000/60;
+                long second = (l - minute*60*1000)/1000;
+                Log.d("Demo", "onTick: "+ minute+ " "+second);
+                TextView timer = findViewById(R.id.timeRemainingTextPlayer2);
+                Log.d("demo","timer value : "+minute+" : "+second);
+                timer.setText(minute+" : "+second);
+                if(second <= 15){
+                    timer.setTextColor(Color.RED);
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                Toast.makeText(Player2GameScreenActivity.this, "This game is done as you have not moved in 1 minute", Toast.LENGTH_SHORT).show();
+                onBackUpdate();
+                //update it in the firestore and then finish the activity
+            }
+        };
+
         DocumentReference docRef = db.collection("ChatRoomList")
                 .document(chatRoomName)
                 .collection("UnoGame")
@@ -101,6 +131,22 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
                 if (snapshot != null && snapshot.exists()) {
                     //this is to check if someone has accepted the request for the game
                     gameDetailsClass = snapshot.toObject(GameDetailsClass.class);
+
+                    if(gameDetailsClass.gameState.equals("COMPLETED")){
+                        //It means that the game state has been completed and the user has to go back to the previous activity
+                        finish();
+                    }
+
+                    if(gameDetailsClass.gameState.equals("PLAYER1_GAVEUP")){
+                        Toast.makeText(Player2GameScreenActivity.this, "Player 1 has given up the game.. You Won!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
+                    if(gameDetailsClass.gameState.equals("PLAYER2_GAVEUP")){
+//                        Toast.makeText(Player2GameScreenActivity.this, "Player 1 has given up the game.. You Won!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
                     thisPlayerCard.clear();
                     thisPlayerCard.addAll(gameDetailsClass.player2Cards);
                     Log.d(TAG, "onEvent: in Player2GameScreenActivity adater item count=>"+usersAdapter.getItemCount());
@@ -117,6 +163,9 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
                         findViewById(R.id.Uno_image_deck5).setEnabled(false);
                     }
                     else if(gameDetailsClass.turn.equals("player2")){
+                        //starting the countDownTimer;
+                        countDownTimer.start();
+
                         isCardPicked = false;
 
                         player1Name.setTextColor(Color.GRAY);
@@ -159,6 +208,7 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
 
                     if(gameDetailsClass.player2Cards!=null && gameDetailsClass.player2Cards.size()==0){
                         Toast.makeText(Player2GameScreenActivity.this, "Game Over. You won!!!", Toast.LENGTH_SHORT).show();
+                        updateWinner();
                     }
                     if(gameDetailsClass.player1Cards!=null && gameDetailsClass.player1Cards.size()==0){
                         Toast.makeText(Player2GameScreenActivity.this, "Game Over. Player 1 won", Toast.LENGTH_SHORT).show();
@@ -225,6 +275,7 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(Player2GameScreenActivity.this, "Turn Skipped", Toast.LENGTH_SHORT).show();
+                        countDownTimer.cancel();
                     }
                 }).addOnFailureListener(Player2GameScreenActivity.this, new OnFailureListener() {
                     @Override
@@ -265,6 +316,7 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Toast.makeText(Player2GameScreenActivity.this, "you played=>"+card, Toast.LENGTH_SHORT).show();
+                                            countDownTimer.cancel();
                                         }
                                     }).addOnFailureListener(Player2GameScreenActivity.this, new OnFailureListener() {
                                         @Override
@@ -277,6 +329,8 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
 
                                     findViewById(R.id.button_skipTurnPlayer2).setEnabled(false);
                                     Toast.makeText(Player2GameScreenActivity.this, "you played=>"+card+" You can play again", Toast.LENGTH_SHORT).show();
+                                    countDownTimer.cancel();
+//                                    countDownTimer.start();
 
                                 }
                                 else if(card.color.equals("black")){
@@ -359,6 +413,53 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
             //tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,100);
         }
     }
+
+
+    //here since the player1  has won the player 1 will update the firebase game as game completed.
+    public void updateWinner(){
+        //update the state of the game to completed
+//        showProgressBarDialog();
+        db.collection("ChatRoomList")
+                .document(chatRoomName)
+                .collection("UnoGame")
+                .document(gameDetailsClass.player1Id)
+                .update("gameState","COMPLETED")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+//                            hideProgressBarDialog();
+                        } else {
+//                            hideProgressBarDialog();
+                            Toast.makeText(Player2GameScreenActivity.this, "Some issue occured in game", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+//                hideProgressBarDialog();
+                Toast.makeText(Player2GameScreenActivity.this, "Some error occured. Please try again", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+    }
+
+    //for showing the progress dialog
+    public void showProgressBarDialog()
+    {
+        progressDialog = new ProgressDialog(Player2GameScreenActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    //for hiding the progress dialog
+    public void hideProgressBarDialog()
+    {
+        progressDialog.dismiss();
+    }
+
 
     public void reshuffleDeckAndPickCard(ArrayList<UnoCardClass> discardCards){
         UnoCardClass topCard = discardCards.get(discardCards.size()-1);
@@ -481,6 +582,7 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(Player2GameScreenActivity.this, "You selected "+colorName+" color", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
+                        countDownTimer.cancel();
                     }
                 }).addOnFailureListener(Player2GameScreenActivity.this, new OnFailureListener() {
                     @Override
@@ -530,4 +632,48 @@ public class Player2GameScreenActivity extends AppCompatActivity implements Play
 //
 //        builderSingle.show();
 //    }
+
+    public void onBackUpdate(){
+        db.collection("ChatRoomList").document(chatRoomName)
+                .collection("UnoGame")
+                .document(gameDetailsClass.player1Id)
+                .update("gameState","PLAYER2_GAVEUP")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(Player2GameScreenActivity.this, "you have given up on this game. Now going back to chatRoom Page", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(Player2GameScreenActivity.this, "Some error occured. Please try again", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    //OnBackPressed function when the Payer 1 is selecting.
+    @Override
+    public void onBackPressed() {
+
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(Player2GameScreenActivity.this);
+        builder1.setMessage("Are you sure you want to give up this game? The other player will win this game");
+        builder1.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        onBackUpdate();
+                    }
+                });
+
+        builder1.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
 }

@@ -371,6 +371,15 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatMessageAd
                                     break;
                                 case MODIFIED:
                                     //Toast.makeText(ChatRoomActivity.this, "It comes to modified", Toast.LENGTH_SHORT).show();
+                                    GameDetailsClass modified = dc.getDocument().toObject(GameDetailsClass.class);
+                                    mAuth = FirebaseAuth.getInstance();
+                                    if(modified.gameState.equals("REQUESTED") && (modified.rejectedPlayers!=null && !modified.rejectedPlayers.contains(mAuth.getCurrentUser().getUid()))){
+                                        Intent intent = new Intent(ChatRoomActivity.this, GameRequestScreenActivity.class);
+                                        intent.putExtra("chatRoomName",chatRoomName);
+                                        intent.putExtra("GameDetailsClass", modified);
+                                        intent.putExtra("userProfile",user);
+                                        startActivity(intent);
+                                    }
                                     break;
                                 case REMOVED:
                                     //Toast.makeText(ChatRoomActivity.this, "It comes to deleted", Toast.LENGTH_SHORT).show();

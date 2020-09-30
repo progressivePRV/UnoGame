@@ -8,10 +8,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
@@ -20,8 +22,10 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -48,10 +52,14 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
     TextView player2Name;
     boolean isUno=false;
     String colorName;
+    private ProgressDialog progressDialog;
     boolean isWildCard=false;
     // handler addded for monitoring if user plays in 1 minute/30 second or not
     private Runnable gameCountDownRunnable;
     private Handler gameCountDownHandler;
+
+    //CountDownTimer
+    private CountDownTimer countDownTimer;
 
 
     @Override
@@ -78,8 +86,30 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
         chatRoomName = getIntent().getExtras().getString("chatRoomName");
         gameDetailsClass = (GameDetailsClass)getIntent().getExtras().getSerializable("gameDetails");
 
-
         final String documentId = gameDetailsClass.player1Id;
+
+        countDownTimer = new CountDownTimer(60*1000, 1000) {
+            @Override
+            public void onTick(long l) {
+                long minute = l/1000/60;
+                long second = (l - minute*60*1000)/1000;
+                Log.d("Demo", "onTick: "+ minute+ " "+second);
+                TextView timer = findViewById(R.id.timeRemainingTextPlayer1);
+                Log.d("demo","timer value : "+minute+" : "+second);
+                timer.setText(minute+" : "+second);
+                if(second <= 15){
+                    timer.setTextColor(Color.RED);
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                Toast.makeText(Player1GameScreenActivity.this, "This game is done as you have not moved in 1 minute", Toast.LENGTH_SHORT).show();
+                onBackUpdate();
+                //update it in the firestore and then finish the activity
+
+            }
+        };
 
         findViewById(R.id.button_skipTurnPlayer1).setEnabled(false);
 
@@ -102,9 +132,25 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
                 }
 
                 if (snapshot != null && snapshot.exists()) {
+
                     //this is to check if someone has accepted the request for the game
                     gameDetailsClass = snapshot.toObject(GameDetailsClass.class);
                     // before adding new card in empty object it needed to be clean and then added
+
+                    if(gameDetailsClass.gameState.equals("COMPLETED")){
+                        //It means that the game state has been completed and the user has to go back to the previous activity
+                        finish();
+                    }
+
+                    if(gameDetailsClass.gameState.equals("PLAYER1_GAVEUP")){
+                        finish();
+                    }
+
+                    if(gameDetailsClass.gameState.equals("PLAYER2_GAVEUP")){
+                        Toast.makeText(Player1GameScreenActivity.this, "Player 2 has given up the game.. You Won!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+
                     Log.d(TAG, "onEvent: in player1GameScreenActivity, player1 got cards=>"+gameDetailsClass.player1Cards);
                     thisPlayerCard.clear();
                     thisPlayerCard.addAll(gameDetailsClass.player1Cards);
@@ -123,6 +169,9 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
                         findViewById(R.id.Uno_image_deck5).setEnabled(false);
                     }
                     else if(gameDetailsClass.turn.equals("player1")){
+                        //starting the countDownTimer;
+                        countDownTimer.start();
+
                         isCardPicked = false;
 
                         player1Name.setTextColor(Color.argb(255,34,177,76));
@@ -139,6 +188,7 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
                             findViewById(R.id.Uno_image_deck5).setEnabled(true);
                             findViewById(R.id.button_skipTurnPlayer1).setEnabled(false);
                         }
+
                     }
 
                     if(gameDetailsClass.plusFourCurrentColor!=null && !gameDetailsClass.plusFourCurrentColor.isEmpty()){
@@ -165,6 +215,7 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
 
                     if(gameDetailsClass.player1Cards!=null && gameDetailsClass.player1Cards.size()==0){
                         Toast.makeText(Player1GameScreenActivity.this, "Game Over. You won!!!", Toast.LENGTH_SHORT).show();
+                        updateWinner();
                     }
                     if(gameDetailsClass.player2Cards!=null && gameDetailsClass.player2Cards.size()==0){
                         Toast.makeText(Player1GameScreenActivity.this, "Game Over. Player 2 won", Toast.LENGTH_SHORT).show();
@@ -230,6 +281,7 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
                 docRef.update("turn","player2").addOnSuccessListener(Player1GameScreenActivity.this, new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        countDownTimer.cancel();
                         Toast.makeText(Player1GameScreenActivity.this, "Turn Skipped", Toast.LENGTH_SHORT).show();
                     }
                 }).addOnFailureListener(Player1GameScreenActivity.this, new OnFailureListener() {
@@ -240,8 +292,51 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
                 });
             }
         });
+    }
 
+    //here since the player1  has won the player 1 will update the firebase game as game completed.
+    public void updateWinner(){
+        //update the state of the game to completed
+//        showProgressBarDialog();
+        db.collection("ChatRoomList")
+                .document(chatRoomName)
+                .collection("UnoGame")
+                .document(gameDetailsClass.player1Id)
+                .update("gameState","COMPLETED")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+//                            hideProgressBarDialog();
+                        } else {
+//                            hideProgressBarDialog();
+                            Toast.makeText(Player1GameScreenActivity.this, "Some issue occured in game", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                hideProgressBarDialog();
+                Toast.makeText(Player1GameScreenActivity.this, "Some error occured. Please try again", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+    }
 
+    //for showing the progress dialog
+    public void showProgressBarDialog()
+    {
+        progressDialog = new ProgressDialog(Player1GameScreenActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+    }
+
+    //for hiding the progress dialog
+    public void hideProgressBarDialog()
+    {
+        progressDialog.dismiss();
     }
 
     @Override
@@ -251,7 +346,7 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
         if(gameDetailsClass.turn.equals("player1")){
             if(isCardValid(gameDetailsClass,postion)){
                 UnoCardClass card = thisPlayerCard.remove(postion);
-
+                countDownTimer.cancel();
                 usersAdapter.notifyDataSetChanged();
 
                 DocumentReference docRef = db.collection("ChatRoomList")
@@ -271,6 +366,7 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
                                         @Override
                                         public void onSuccess(Void aVoid) {
                                             Toast.makeText(Player1GameScreenActivity.this, "you played=>"+card, Toast.LENGTH_SHORT).show();
+                                            countDownTimer.cancel();
                                         }
                                     }).addOnFailureListener(Player1GameScreenActivity.this, new OnFailureListener() {
                                         @Override
@@ -283,6 +379,9 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
 
                                     findViewById(R.id.button_skipTurnPlayer1).setEnabled(false);
                                     Toast.makeText(Player1GameScreenActivity.this, "you played=>"+card+" You can play again", Toast.LENGTH_SHORT).show();
+                                    countDownTimer.cancel();
+//                                    countDownTimer.start();
+
 
                                 }
                                 else if(card.color.equals("black")){
@@ -489,6 +588,7 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(Player1GameScreenActivity.this, "You selected "+colorName+" color", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
+                        countDownTimer.cancel();
                     }
                 }).addOnFailureListener(Player1GameScreenActivity.this, new OnFailureListener() {
                     @Override
@@ -538,4 +638,49 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
 //
 //        builderSingle.show();
 //    }
+
+    public void onBackUpdate(){
+        db.collection("ChatRoomList").document(chatRoomName)
+                .collection("UnoGame")
+                .document(gameDetailsClass.player1Id)
+                .update("gameState","PLAYER1_GAVEUP")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(Player1GameScreenActivity.this, "you have given up on this game. Now going back to chatRoom Page", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(Player1GameScreenActivity.this, "Some error occured. Please try again", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    //OnBackPressed function when the Payer 1 is selecting.
+    @Override
+    public void onBackPressed() {
+
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(Player1GameScreenActivity.this);
+        builder1.setMessage("Are you sure you want to give up this game? The other player will win this game");
+        builder1.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        onBackUpdate();
+                    }
+                });
+
+        builder1.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+    }
 }

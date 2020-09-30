@@ -146,6 +146,12 @@ public class GameRequestScreenActivity extends AppCompatActivity {
                                 finish();
                             }
                         }
+
+                        if(gameDetailsClass.gameState.equals("COMPLETED")){
+                            //finishing the game as the game state is completed
+                            finish();
+                        }
+
                     } else {
                         System.out.print("Current data: null");
                     }
