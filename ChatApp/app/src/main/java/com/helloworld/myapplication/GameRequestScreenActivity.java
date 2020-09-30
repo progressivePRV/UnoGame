@@ -220,4 +220,10 @@ public class GameRequestScreenActivity extends AppCompatActivity {
             gameRequesthandler.removeCallbacks(gameRequestRunnable);
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        addRejectedPlayer();
+    }
 }
