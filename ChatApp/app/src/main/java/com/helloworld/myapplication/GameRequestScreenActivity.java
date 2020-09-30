@@ -33,6 +33,10 @@ public class GameRequestScreenActivity extends AppCompatActivity {
     boolean isYesClicked = false;
     TextView requestedPlayerName;
 
+    ///
+    Handler gameRequesthandler = null;
+    Runnable gameRequestRunnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,8 +102,9 @@ public class GameRequestScreenActivity extends AppCompatActivity {
 
 
         //The request will be there only for 20 seconds. If no then the player will be sent to the rejected players.
-        Handler handler=new Handler();
-        handler.postDelayed(new Runnable() {
+
+        gameRequesthandler = new Handler();
+        gameRequestRunnable = new Runnable() {
             @Override
             public void run() {
                 if(!isYesClicked){
@@ -107,7 +112,8 @@ public class GameRequestScreenActivity extends AppCompatActivity {
                     addRejectedPlayer();
                 }
             }
-        },20000);
+        };
+        gameRequesthandler.postDelayed(gameRequestRunnable,20000);
 
     }
 
@@ -203,5 +209,13 @@ public class GameRequestScreenActivity extends AppCompatActivity {
     public void hideProgressBarDialog()
     {
         progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(gameRequesthandler != null){
+            gameRequesthandler.removeCallbacks(gameRequestRunnable);
+        }
     }
 }

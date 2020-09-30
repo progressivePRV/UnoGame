@@ -103,6 +103,10 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
     OkHttpClient client;
     RequestedRides requestedRides;
     LatLngBounds.Builder latlngBuilder;
+    ////
+    Handler rejectHandler = null;
+    Runnable rejectRunnable;
+
 
     @Override
     protected void onResume() {
@@ -303,8 +307,8 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
         });
 
 
-        Handler handler=new Handler();
-        handler.postDelayed(new Runnable() {
+
+        rejectRunnable = new Runnable() {
             @Override
             public void run() {
                 if(!isYesClicked){
@@ -313,7 +317,9 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
                     addRejectedRide();
                 }
             }
-        },20000);
+        };
+        rejectHandler = new Handler();
+        rejectHandler.postDelayed(rejectRunnable,20000);
 
         findViewById(R.id.buttonDriverNo).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -596,6 +602,14 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
             }
         });
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(rejectHandler!=null){
+            rejectHandler.removeCallbacks(rejectRunnable);
+        }
     }
 }
 
