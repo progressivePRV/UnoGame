@@ -8,13 +8,13 @@
 
     <ImageView
         android:id="@+id/imageView13"
-        android:layout_width="336dp"
-        android:layout_height="454dp"
+        android:layout_width="250dp"
+        android:layout_height="350dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonStartGame"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_gamepad_24" />
+        app:srcCompat="@drawable/uno_black_2" />
 
     <Button
         android:id="@+id/buttonStartGame"
@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:text="@string/game_start"
+        android:textColor="@color/places_text_black_alpha_87"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

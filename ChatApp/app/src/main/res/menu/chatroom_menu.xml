@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id = "@+id/button_game"
-        android:icon="@drawable/ic_baseline_gamepad_24"
+        android:icon="@drawable/uno_white"
         android:title="@string/request_game"
         app:showAsAction="always"/>
 

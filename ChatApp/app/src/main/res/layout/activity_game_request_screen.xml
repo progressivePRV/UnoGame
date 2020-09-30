@@ -8,19 +8,23 @@
 
     <ImageView
         android:id="@+id/imageView14"
-        android:layout_width="375dp"
-        android:layout_height="454dp"
+        android:layout_width="250dp"
+        android:layout_height="350dp"
         app:layout_constraintBottom_toTopOf="@+id/buttonPlayNo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6"
-        app:srcCompat="@drawable/ic_baseline_gamepad_24" />
+        app:srcCompat="@drawable/uno_black_2" />
 
     <Button
         android:id="@+id/buttonPlayYes"
         android:layout_width="175dp"
         android:layout_height="50dp"
         android:layout_marginEnd="16dp"
+        android:background="#4CAF50"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:layout_marginBottom="32dp"
         android:text="@string/confirmedGameYes"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -31,6 +35,10 @@
         android:layout_width="175dp"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
+        android:background="#f44336"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:layout_marginBottom="32dp"
         android:text="@string/confirmedGameNo"
         app:layout_constraintBottom_toBottomOf="parent"
