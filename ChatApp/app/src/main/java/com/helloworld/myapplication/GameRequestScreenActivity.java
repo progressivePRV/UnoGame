@@ -49,7 +49,7 @@ public class GameRequestScreenActivity extends AppCompatActivity {
         requestedPlayerName = findViewById(R.id.requestedPlayerName);
         requestedPlayerName.setText(gameDetailsClass.player1Name);
 
-        attachListenerToGame();
+        //attachListenerToGame();
 
         //if the player selected no then he is added to the game rejected player list
         findViewById(R.id.buttonPlayNo).setOnClickListener(new View.OnClickListener() {
@@ -111,7 +111,13 @@ public class GameRequestScreenActivity extends AppCompatActivity {
 
     }
 
-        public void attachListenerToGame(){
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        attachListenerToGame();
+    }
+
+    public void attachListenerToGame(){
             //Adding snapshot listener for accepted players so if the user has accepted to the firestore then the game should progress
             DocumentReference docRef = db.collection("ChatRoomList")
                     .document(chatRoomName)
