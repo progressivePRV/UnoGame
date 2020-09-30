@@ -489,6 +489,7 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatMessageAd
                 i.putExtra("chatRoomName",chatRoomName);
                 i.putExtra("user",user);
                 startActivity(i);
+                break;
 
             case R.id.button_game:
                 //showProgressBarDialog();
@@ -501,9 +502,11 @@ public class ChatRoomActivity extends AppCompatActivity implements ChatMessageAd
                 intent.putExtra("chatRoomName",chatRoomName);
                 intent.putExtra("gameDetails",gameDetails);
                 startActivity(intent);
+                break;
 
             default:
                 Log.d(TAG, "onOptionsItemSelected: default case called in chatroom activity");
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
