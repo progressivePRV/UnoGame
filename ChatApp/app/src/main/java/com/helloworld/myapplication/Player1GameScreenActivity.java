@@ -684,4 +684,10 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
         AlertDialog alert11 = builder1.create();
         alert11.show();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        countDownTimer.cancel();
+    }
 }
