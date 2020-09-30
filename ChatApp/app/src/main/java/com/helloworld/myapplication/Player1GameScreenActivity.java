@@ -97,6 +97,7 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
                 TextView timer = findViewById(R.id.timeRemainingTextPlayer1);
                 Log.d("demo","timer value : "+minute+" : "+second);
                 timer.setText(minute+" : "+second);
+                timer.setTextColor(Color.BLACK);
                 if(second <= 15){
                     timer.setTextColor(Color.RED);
                 }
@@ -461,7 +462,8 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
             }
         }else{
             tv.setText(""+card.number);
-            //tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,100);
+            tv.setPadding(0,0,0,0);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,130);
         }
     }
 

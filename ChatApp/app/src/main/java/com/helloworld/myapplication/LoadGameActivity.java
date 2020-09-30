@@ -27,6 +27,7 @@ import java.util.Collections;
 
 public class LoadGameActivity extends AppCompatActivity {
 
+    private static final String TAG = "okay";
     private FirebaseFirestore db;
     private ProgressDialog progressDialog;
     private String chatRoomName;
@@ -67,10 +68,11 @@ public class LoadGameActivity extends AppCompatActivity {
                                         @Override
                                         public void run() {
                                             Toast.makeText(LoadGameActivity.this, "Sorry No Players found at this time. Please try again later", Toast.LENGTH_SHORT).show();
-
+                                            Log.d(TAG, "run: handler in load game activity called for deleting the game");
                                             //have to delete that request from the firestore
                                             //update the request to completed
-//                                            deleteGameRequest();
+                                            deleteGameRequest();
+                                            finish();
                                         }
                                     };
                                     startGameHandler = new Handler();
@@ -264,7 +266,9 @@ public class LoadGameActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         // this wil remove handler wherever user leaves this activity
+        Log.d(TAG, "onStop: called in load game activity");
         if(startGameHandler!=null){
+            Log.d(TAG, "onStop: start game handler was not null in load game activity");
             startGameHandler.removeCallbacks(startGameRunnable);
         }
 

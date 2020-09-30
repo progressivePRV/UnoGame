@@ -83,6 +83,8 @@ public class PlayerCardListAdapter extends RecyclerView.Adapter<PlayerCardListAd
             }
         }else{
             holder.tv.setText(""+card.number);
+            holder.tv.setTextSize(TypedValue.COMPLEX_UNIT_SP,40);
+            holder.tv.setPadding(0,0,0,0);
         }
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {

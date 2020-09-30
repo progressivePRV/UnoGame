@@ -32,10 +32,10 @@
             android:id="@+id/tv_in_discardCard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="30dp"
             android:text="0"
             android:textAlignment="center"
-            android:textSize="60sp" />
+            android:textSize="130sp" />
     </androidx.cardview.widget.CardView>
 
     <TextView
