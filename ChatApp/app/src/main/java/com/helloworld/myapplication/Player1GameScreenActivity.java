@@ -620,7 +620,7 @@ public class Player1GameScreenActivity extends AppCompatActivity implements Play
     }
 
     public void startgameCountDownHandler(){
-        gameCountDownHandler.postDelayed(gameCountDownRunnable,30000);
+        gameCountDownHandler.postDelayed(gameCountDownRunnable,60000);
     }
 
     public void stopgameCountDownHandler(){
