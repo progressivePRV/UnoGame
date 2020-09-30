@@ -25,6 +25,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class GameRequestScreenActivity extends AppCompatActivity {
 
+    private static final String TAG = "okay";
     private String chatRoomName;
     private GameDetailsClass gameDetailsClass;
     private UserProfile user;
@@ -212,9 +213,10 @@ public class GameRequestScreenActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        if(gameRequesthandler != null){
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: game request screen");
+        if (gameRequesthandler != null) {
             gameRequesthandler.removeCallbacks(gameRequestRunnable);
         }
     }

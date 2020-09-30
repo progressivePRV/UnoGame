@@ -605,8 +605,9 @@ public class DriverMapsActivity extends FragmentActivity implements OnMapReadyCa
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(cTAG, "onDestroy: driver maps activity");
         if(rejectHandler!=null){
             rejectHandler.removeCallbacks(rejectRunnable);
         }
